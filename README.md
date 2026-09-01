@@ -2,7 +2,7 @@
 
 - 학번: 202230138
 - 이름 (영문): 추형우 (Twilight995)
-- 배운 언어경험: C, C#, Java, Python, Flutter
+- 배운 언어경험: C, C#, Java, Python, Kotlin, Flutter
 
 
 ## 1주차 GPU 측정 결과
