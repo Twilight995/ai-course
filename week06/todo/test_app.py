@@ -40,5 +40,35 @@ class TodoTestCase(unittest.TestCase):
         response = self.client.post('/add', data={'title': ''})
         self.assertEqual(response.status_code, 400)
 
+    def test_post_toggle_success(self):
+        """POST /toggle/1 (ID 존재) - 302 Redirect 및 해당 ID의 완료 여부 변경 확인"""
+        # 먼저 테스트용 데이터 하나 생성
+        with app.app_context():
+            todo = Todo(title="테스트용")
+            db.session.add(todo)
+            db.session.commit()
+            todo_id = todo.id
+
+        # 완료 상태로 변경 시도
+        response = self.client.post(f'/toggle/{todo_id}', follow_redirects=False)
+        self.assertEqual(response.status_code, 302)
+        
+        with app.app_context():
+            todo = Todo.query.get(todo_id)
+            self.assertTrue(todo.completed)
+
+        # 다시 해제 시도
+        response = self.client.post(f'/toggle/{todo_id}', follow_redirects=False)
+        self.assertEqual(response.status_code, 302)
+        
+        with app.app_context():
+            todo = Todo.query.get(todo_id)
+            self.assertFalse(todo.completed)
+
+    def test_post_toggle_not_found(self):
+        """POST /toggle/999 (ID 없음) - 404 Not Found 에러 발생"""
+        response = self.client.post('/toggle/999', follow_redirects=False)
+        self.assertEqual(response.status_code, 404)
+
 if __name__ == '__main__':
     unittest.main()

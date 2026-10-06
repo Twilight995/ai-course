@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <div class="container">
     <h1>할 일 목록</h1>
     
     <form action="/add" method="post">
@@ -13,12 +15,39 @@
         <button type="submit">추가</button>
     </form>
 
-    <ul>
-        {% for todo in todos %}
-            <li>
-                {{ todo.title }}
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="todo-section">
+        <h2>진행 중인 할 일</h2>
+        <ul>
+            {% for todo in active_todos %}
+                <li>
+                    <form action="/toggle/{{ todo.id }}" method="post" style="display: inline;">
+                        <button type="submit">[완료]</button>
+                    </form>
+                    <span>{{ todo.title }}</span>
+                    <form action="/delete/{{ todo.id }}" method="post" style="display: inline;">
+                        <button type="submit">삭제</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="todo-section completed-section">
+        <h2>완료된 할 일</h2>
+        <ul>
+            {% for todo in completed_todos %}
+                <li class="completed-item">
+                    <form action="/toggle/{{ todo.id }}" method="post" style="display: inline;">
+                        <button type="submit">[완료 해제]</button>
+                    </form>
+                    <span>{{ todo.title }}</span>
+                    <form action="/delete/{{ todo.id }}" method="post" style="display: inline;">
+                        <button type="submit">삭제</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    </div>
 </body>
 </html>
