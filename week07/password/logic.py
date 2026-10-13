@@ -1,7 +1,7 @@
 import random
 import string
 
-def generate_password(length_str, use_upper=False, use_digits=False, use_special=False):
+def generate_password(length_str, use_upper=False, use_digits=False, use_special=False, exclude_similar=False):
     # 1. 입력값 검증
     if not length_str:
         return "길이를 입력해주세요"
@@ -17,28 +17,34 @@ def generate_password(length_str, use_upper=False, use_digits=False, use_special
 
     # 3. 비밀번호 생성 준비
     lowercase = string.ascii_lowercase
-    uppercase = string.ascii_uppercase if use_upper else ""
-    digits = string.digits if use_digits else ""
-    special = "!@#$%^&*" if use_special else ""
+    uppercase = string.ascii_uppercase
+    digits = string.digits
+    special = "!@#$%^&*"
 
-    all_chars = lowercase + uppercase + digits + special
-    
-    # 사용 가능한 문자가 소문자만 있는 경우 (모두 체크 해제 시)
-    # 규칙: 소문자는 항상 들어간다.
-    
+    if exclude_similar:
+        lowercase = "".join([c for c in lowercase if c not in "o l"])
+        uppercase = "".join([c for c in uppercase if c not in "O I"])
+        digits = "".join([c for c in digits if c not in "0 1"])
+
+    actual_upper = uppercase if use_upper else ""
+    actual_digits = digits if use_digits else ""
+    actual_special = special if use_special else ""
+
+    all_chars = lowercase + actual_upper + actual_digits + actual_special
+
     password = []
-    
+
     # 각 필수 문자를 최소 하나씩 보장
     if use_upper:
-        password.append(random.choice(uppercase))
+        password.append(random.choice(actual_upper))
     if use_digits:
-        password.append(random.choice(digits))
+        password.append(random.choice(actual_digits))
     if use_special:
-        password.append(random.choice(special))
-    
+        password.append(random.choice(actual_special))
+
     # 소문자는 항상 필수
     password.append(random.choice(lowercase))
-    
+
     # 나머지 길이를 채움
     remaining_length = length - len(password)
     for _ in range(remaining_length):
