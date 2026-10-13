@@ -5,23 +5,11 @@ def generate_password(length_str, use_upper=False, use_digits=False, use_special
     # 1. 입력값 검증
     if not length_str:
         return "길이를 입력해주세요"
-    
-    # 공백 포함 여부 확인 (앞뒤 공백이 포함되어 있으면 "숫자만 입력해주세요" 반환)
-    # 주의: input().strip()을 미리 하면 안 됨. raw string을 받아야 함.
-    if length_str != length_str.strip():
-         return "숫자만 입력해주세요"
 
-    try:
-        # 정수인지 확인 (소수 포함 시 ValueError가 나거나 int 변환 실패)
-        # 하지만 "5.5" 같은 경우 int("5.5")는 ValueError를 던짐.
-        # "문자, 소수 포함" 일 때 "숫자만 입력해주세요"라고 해야 함.
-        # float()로 변환했을 때 정수가 아니면 소수임.
-        val = float(length_str)
-        if not val.is_integer():
-            return "숫자만 입력해주세요"
-        length = int(val)
-    except ValueError:
+    if length_str != length_str.strip() or not length_str.isdigit():
         return "숫자만 입력해주세요"
+
+    length = int(length_str)
 
     # 2. 길이 범위 검증
     if length < 4 or length > 32:
