@@ -48,3 +48,9 @@ def generate_password(length_str, use_upper=False, use_digits=False, use_special
     random.shuffle(password)
     
     return "".join(password)
+
+ERROR_MESSAGES = [
+    "길이를 입력해주세요",
+    "숫자만 입력해주세요",
+    "4~32 사이로 입력해주세요"
+]
