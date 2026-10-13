@@ -13,7 +13,8 @@ def main(page: ft.Page):
     upper_check = ft.Checkbox(label="대문자 포함", value=False)
     digit_check = ft.Checkbox(label="숫자 포함", value=False)
     special_check = ft.Checkbox(label="특수문자 포함", value=False)
-    
+    similar_check = ft.Checkbox(label="헷갈리는 글자 빼기", value=False)
+
     result_text = ft.Text(value="")
     notice_text = ft.Text(value="", color=ft.Colors.RED)
 
@@ -22,7 +23,8 @@ def main(page: ft.Page):
             length_input.value,
             upper_check.value,
             digit_check.value,
-            special_check.value
+            special_check.value,
+            similar_check.value
         )
         
         if res in logic.ERROR_MESSAGES:
@@ -41,6 +43,7 @@ def main(page: ft.Page):
         upper_check,
         digit_check,
         special_check,
+        similar_check,
         ft.Button(content="만들기", on_click=on_generate, expand=True, bgcolor=ft.Colors.BLUE, color=ft.Colors.WHITE),
         result_text,
         ft.Button(content="다시 만들기", on_click=on_regenerate, expand=True, bgcolor=ft.Colors.GREY, color=ft.Colors.WHITE),
