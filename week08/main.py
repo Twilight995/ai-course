@@ -5,12 +5,15 @@ import flet as ft
 def main(page: ft.Page):
     page.window.width = 420
     page.window.height = 600
+    page.title = "주차 요금 계산기"
+    page.window.resizable = False
 
     import logic
 
     total_text = ft.Text(value="합계: 0원", size=20, weight=ft.FontWeight.BOLD)
-    in_time_field = ft.TextField(label="입차 시각")
-    out_time_field = ft.TextField(label="출차 시각")
+    in_time_field = ft.TextField(label="입차 시각", width=180)
+    out_time_field = ft.TextField(label="출차 시각", width=180)
+    time_row = ft.Row(controls=[in_time_field, out_time_field])
     calc_button = ft.Button(content="계산", on_click=lambda e: None, expand=True, height=44, bgcolor=ft.Colors.BLUE, color=ft.Colors.WHITE)
     # Note: Button content must be a control. The instruction says "Button (텍스트: "계산", 파란 바탕에 흰 글자)". 
     # But in the skeleton, Button(content=...) is used. I'll use Text in content to match skeleton style if needed, 
@@ -61,9 +64,8 @@ def main(page: ft.Page):
 
     page.add(
         total_text,
-        in_time_field,
-        out_time_field,
-        calc_button,
+        time_row,
+         ft.Row(controls=[calc_button]),
         notice,
         items_list
     )
