@@ -1,0 +1,9 @@
+week10/*.json
+week10/*.pdf
+
+# 파이썬이 실행하면서 만드는 캐시
+__pycache__/
+
+# 스크립트로 다시 만들 수 있는 9주차 결과물
+week09/campus.db
+week09/index.npz
