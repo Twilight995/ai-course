@@ -97,12 +97,30 @@ def run_tests():
     # Let's check the original rows.
     tests.append((20, "level" in rows[0], False))
 
+    # 21. len(load_smoking())
+    srows = logic.load_smoking()
+    tests.append((21, len(srows), 17))
+
+    # 22. load_smoking()[0]
+    tests.append((22, srows[0], {"region": "대구광역시", "registered": 12023, "high_pct": 21.8, "camp_use": 325, "camp_per_1000": 124.0}))
+
+    # 23. len(result)
+    result = logic.smoking_priority(srows)
+    tests.append((23, len(result), 17))
+
+    tests.append((24, (result[0]["region"], result[0]["rank"], result[0]["camp_use"]), ("세종특별자치시", 1, 0)))
+    tests.append((25, (result[1]["region"], result[1]["rank"], result[1]["camp_per_1000"]), ("경상남도", 2, 108.0)))
+    tests.append((26, (result[2]["region"], result[2]["rank"]), ("서울특별시", 3)))
+    tests.append((27, (result[16]["region"], result[16]["rank"], result[16]["camp_per_1000"]), ("울산광역시", 17, 511.0)))
+    tests.append((28, ("rank" in srows[0], srows[0]["region"]), (False, "대구광역시")))
+
     for num, actual, expected in tests:
         if actual == expected:
             passed += 1
         else:
             print(f"실패 {num}: 기대값 {expected}, 실제값 {actual}")
 
+    total = len(tests)
     print(f"통과 {passed} / 전체 {total}")
 
 if __name__ == "__main__":

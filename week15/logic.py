@@ -2,7 +2,7 @@ import csv
 
 def load_library(path="data/library_gap.csv"):
     rows = []
-    with open(path, mode='r', encoding='utf-8-sig') as f:
+    with open(path, mode="r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for row in reader:
             new_row = {
@@ -41,7 +41,6 @@ def gap_level(hub, weekend_closed_pct):
         return "green"
 
 def library_card(rows, sido, sigungu):
-    # Check for empty or None sido/sigungu
     sido_clean = str(sido).strip() if sido is not None else ""
     sigungu_clean = str(sigungu).strip() if sigungu is not None else ""
 
@@ -62,8 +61,32 @@ def library_card(rows, sido, sigungu):
                 level_text = "거점 1곳 · 주말 휴관 많음"
             else:
                 level_text = "균형"
-            
+
             card["level_text"] = level_text
             return (card, None)
             
     return (None, "등록된 도서관 정보가 없습니다")
+
+def load_smoking(path="data/smoking_resource.csv"):
+    rows = []
+    with open(path, mode="r", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            new_row = {
+                "region": row["지역"],
+                "registered": int(row["등록자"]),
+                "high_pct": float(row["고의존비율"]),
+                "camp_use": int(row["캠프이용"]),
+                "camp_per_1000": float(row["고의존1000명당캠프"])
+            }
+            rows.append(new_row)
+    return rows
+
+def smoking_priority(rows):
+    sorted_rows = sorted(rows, key=lambda x: x["camp_per_1000"])
+    result = []
+    for i, row in enumerate(sorted_rows):
+        new_row = dict(row)
+        new_row["rank"] = i + 1
+        result.append(new_row)
+    return result
