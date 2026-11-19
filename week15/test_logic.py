@@ -114,6 +114,23 @@ def run_tests():
     tests.append((27, (result[16]["region"], result[16]["rank"], result[16]["camp_per_1000"]), ("울산광역시", 17, 511.0)))
     tests.append((28, ("rank" in srows[0], srows[0]["region"]), (False, "대구광역시")))
 
+    scard, serr = logic.library_card(rows, "전남광주통합특별시", "완도군")
+    hcard, herr = logic.library_card(rows, "경상남도", "하동군")
+    sprompt = logic.build_summary_prompt(scard)
+    tests.append((29, logic.fallback_summary(scard), "전남광주통합특별시 완도군에는 등록된 도서관이 3곳 있고, 그중 대형 거점은 0곳입니다. 주말에 쉬는 곳은 66.7%입니다."))
+    tests.append((30, logic.fallback_summary(hcard), "경상남도 하동군에는 등록된 도서관이 12곳 있고, 그중 대형 거점은 1곳입니다. 주말에 쉬는 곳은 91.7%입니다."))
+    tests.append((31, "완도군" in sprompt, True))
+    tests.append((32, "아래 숫자만 사용" in sprompt, True))
+    tests.append((33, "두 문장" in sprompt, True))
+    tests.append((34, "66.7" in sprompt, True))
+    tests.append((35, "거점 도서관 없음" in sprompt, True))
+    tests.append((36, logic.is_safe_summary(logic.fallback_summary(scard), scard), True))
+    tests.append((37, logic.is_safe_summary("", scard), False))
+    tests.append((38, logic.is_safe_summary(None, scard), False))
+    tests.append((39, logic.is_safe_summary("완도군에는 도서관이 5곳 있습니다.", scard), False))
+    tests.append((40, logic.is_safe_summary("완도군은 거점 도서관이 없습니다.", scard), True))
+    tests.append((41, logic.is_safe_summary(logic.fallback_summary(hcard), hcard), True))
+
     for num, actual, expected in tests:
         if actual == expected:
             passed += 1

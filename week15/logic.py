@@ -1,4 +1,5 @@
 import csv
+import re
 
 def load_library(path="data/library_gap.csv"):
     rows = []
@@ -90,3 +91,28 @@ def smoking_priority(rows):
         new_row["rank"] = i + 1
         result.append(new_row)
     return result
+
+def fallback_summary(card):
+    return f"{card['sido']} {card['sigungu']}에는 등록된 도서관이 {card['total']}곳 있고, 그중 대형 거점은 {card['hub']}곳입니다. 주말에 쉬는 곳은 {card['weekend_closed_pct']}%입니다."
+def build_summary_prompt(card):
+    return (f"아래 숫자만 사용해서 {card['sido']} {card['sigungu']}의 도서관 현황을 한국어 두 문장으로 설명해줘. "
+            f"도서관을 세는 단위는 '곳'을 써야 해. 아래에 없는 숫자는 쓰지 마.\n"
+            f"- 전체 도서관: {card['total']}곳\n"
+            f"- 대형 거점 도서관: {card['hub']}곳\n"
+            f"- 동네 도서관: {card['small']}곳\n"
+            f"- 주말 휴관 비율: {card['weekend_closed_pct']}%\n"
+            f"- 상태: {card['level_text']}")
+
+def is_safe_summary(text, card):
+    if text is None or not text.strip():
+        return False
+    
+    allowed_numbers = {float(card['total']), float(card['hub']), float(card['small']), 
+                       float(card['suspect']), float(card['reading']), 
+                       float(card['weekend_closed']), float(card['weekend_closed_pct'])}
+    
+    numbers_in_text = re.findall(r"\d+(?:\.\d+)?", text)
+    for num_str in numbers_in_text:
+        if float(num_str) not in allowed_numbers:
+            return False
+    return True
