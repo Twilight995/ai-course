@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리 지역 공공데이터 요약</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 16px;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+        }
+        h1 {
+            font-size: 1.5rem;
+        }
+        nav {
+            margin-bottom: 20px;
+        }
+        nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: blue;
+        }
+        .description {
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>우리 지역 공공데이터 요약</h1>
+        <nav>
+            <a href="/">도서관</a>
+            <a href="/smoking">금연 지원</a>
+        </nav>
+
+        <p class="description">고의존 흡연자 1,000명당 금연캠프 이용 건수가 적은 순서입니다.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>순위</th>
+                    <th>지역</th>
+                    <th>고의존 비율</th>
+                    <th>1,000명당 캠프 이용</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row.region }}</td>
+                    <td>{{ row.high_pct }}%</td>
+                    <td>{% if row.camp_use == 0 %}이용 기록 없음{% else %}{{ row.camp_per_1000 }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

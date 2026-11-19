@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리 지역 공공데이터 요약</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 16px;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+        }
+        h1 {
+            font-size: 1.5rem;
+        }
+        nav {
+            margin-bottom: 20px;
+        }
+        nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: blue;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        select, button {
+            height: 44px;
+            font-size: 16px;
+        }
+        .message {
+            margin: 10px 0;
+        }
+        .card {
+            border-left: 8px solid;
+            padding: 15px;
+            background-color: #f9f9f9;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            margin-top: 0;
+        }
+        .card p {
+            margin: 5px 0;
+        }
+        .summary-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>우리 지역 공공데이터 요약</h1>
+        <nav>
+            <a href="/">도서관</a>
+            <a href="/smoking">금연 지원</a>
+        </nav>
+
+        <form method="get" action="/">
+            <select name="region">
+                <option value="">지역 선택</option>
+                {% for sido, sigungus in groups %}
+                <optgroup label="{{ sido }}">
+                    {% for sigungu in sigungus %}
+                    <option value="{{ sido }}|{{ sigungu }}" {% if region == sido ~ '|' ~ sigungu %}selected{% endif %}>{{ sigungu }}</option>
+                    {% endfor %}
+                </optgroup>
+                {% endfor %}
+            </select>
+            <button type="submit">보기</button>
+        </form>
+
+        {% if message %}
+        <p class="message">{{ message }}</p>
+        {% endif %}
+
+        {% if card %}
+        <div class="card" style="border-left-color: {% if card.level == 'red' %}#d32f2f{% elif card.level == 'orange' %}#f57c00{% elif card.level == 'green' %}#388e3c{% endif %};">
+            <h2>{{ card.sido }} {{ card.sigungu }}</h2>
+            <p>{{ card.level_text }}</p>
+            <p>전체 도서관 {{ card.total }}곳</p>
+            <p>대형 거점 {{ card.hub }}곳</p>
+            <p>동네 도서관 {{ card.small }}곳</p>
+            <p>주말 휴관 {{ card.weekend_closed_pct }}%</p>
+        </div>
+
+        <div class="summary-section">
+            <strong>{{ summary_label }}</strong>
+            <p>{{ summary }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
