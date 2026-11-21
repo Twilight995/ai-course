@@ -1,6 +1,7 @@
 import csv
 import re
 import statistics
+from urllib.parse import quote
 
 def load_library(path="data/library_gap.csv"):
     rows = []
@@ -329,3 +330,73 @@ def sido_regions(rows, sido):
             "pop": row["pop"]
         })
     return result
+
+def dot_color(lacking_count):
+    if lacking_count >= 4:
+        return "#c0392b"
+    elif lacking_count in [2, 3]:
+        return "#e67e22"
+    else:
+        return "#7f9fc5"
+
+def map_points(rows, sido=None):
+    if sido is None:
+        target_rows = rows
+    else:
+        target_rows = [r for r in rows if r["sido"] == sido]
+    
+    if not target_rows:
+        return {"width": 1000, "height": 300, "points": []}
+    
+    sorted_rows = sorted(target_rows, key=lambda x: (x["lacking_count"], x["sigungu"]))
+    
+    if sido is None:
+        max_y = max(r["map_y"] for r in target_rows)
+        height = max_y + 20
+        points = []
+        for r in sorted_rows:
+            points.append({
+                "x": r["map_x"],
+                "y": r["map_y"],
+                "color": dot_color(r["lacking_count"]),
+                "sido": r["sido"],
+                "sigungu": r["sigungu"],
+                "lacking_count": r["lacking_count"]
+            })
+        return {"width": 1000, "height": height, "points": points}
+    else:
+        min_x = min(r["map_x"] for r in target_rows)
+        max_x = max(r["map_x"] for r in target_rows)
+        min_y = min(r["map_y"] for r in target_rows)
+        max_y = max(r["map_y"] for r in target_rows)
+        
+        span = max(max_x - min_x, max_y - min_y, 1)
+        scale = 900 / span
+        cx = (min_x + max_x) / 2
+        cy = (min_y + max_y) / 2
+        height = max(300, round(100 + (max_y - min_y) * scale))
+        
+        points = []
+        for r in sorted_rows:
+            points.append({
+                "x": round(500 + (r["map_x"] - cx) * scale),
+                "y": round(height / 2 + (r["map_y"] - cy) * scale),
+                "color": dot_color(r["lacking_count"]),
+                "sido": r["sido"],
+                "sigungu": r["sigungu"],
+                "lacking_count": r["lacking_count"]
+            })
+        return {"width": 1000, "height": height, "points": points}
+
+def build_map_svg(map_data, big=False):
+    r = 22 if big else 9
+    res = f'<svg viewBox="0 0 {map_data["width"]} {map_data["height"]}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="점 지도">'
+    for p in map_data["points"]:
+        region = quote(p["sido"] + "|" + p["sigungu"])
+        res += f'<a href="/region?region={region}">'
+        res += f'<circle cx="{p["x"]}" cy="{p["y"]}" r="{r}" fill="{p["color"]}"><title>{p["sido"]} {p["sigungu"]} · 부족 {p["lacking_count"]}개</title></circle>'
+        if big:
+            res += f'<text x="{p["x"] + 28}" y="{p["y"] + 10}" font-size="30">{p["sigungu"]}</text>'
+        res += '</a>'
+    res += '</svg>'
+    return res

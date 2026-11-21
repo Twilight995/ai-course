@@ -7,6 +7,7 @@
  | 5단계 | 스마트폰 최종 확인 | 아이폰 브라우저 직접 확인 | 확인표 5 / 5 통과 | 2026. 11. 19. |
 | 준비 | data/welfare_gap.csv 추가, SPEC.md 를 v2 로 고침(이전 명세는 SPEC_v1.md), .clinerules 에 주소 이동 예외 추가 | python test_logic.py, python test_app.py | 통과 41 / 전체 41, 통과 7 / 전체 7 | 2026. 11. 21. |
 | 6단계 | 격차 자료 읽기(load_gap), 숫자 표시(show_number), 영역 7개와 전국 중앙값(GAP_DOMAINS, gap_medians), 지역 카드(gap_card), 알아 둘 점(gap_notices), 부족 많은 곳·시도별 목록(top_lacking, sido_regions) | python test_logic.py | 통과 90 / 전체 90 | 2026. 11. 21. |
+| 7단계 | 점의 색(dot_color), 전국·시도 지도의 점 자리(map_points), 점 지도 그림(build_map_svg). Gemma4가 build_map_svg 를 map_points 한가운데에 넣어 문법 오류 → 함수 자리를 맨 아래로 옮기고 들여쓰기를 고친 뒤 통과 | python test_logic.py | 통과 107 / 전체 107 | 2026. 11. 21. |
  
  ## 5단계 스마트폰 확인표
  

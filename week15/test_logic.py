@@ -1,4 +1,5 @@
 import logic
+from urllib.parse import quote
 
 def run_tests():
     rows = logic.load_library()
@@ -190,6 +191,29 @@ def run_tests():
     incheon = logic.sido_regions(gap, "인천광역시")
     tests.append((89, (len(incheon), [r["sigungu"] for r in incheon[:3]]), (11, ["미추홀구", "검단구", "부평구"])))
     tests.append((90, logic.sido_regions(gap, "없는도"), []))
+    tests.append((91, [logic.dot_color(n) for n in range(6)], ["#7f9fc5", "#7f9fc5", "#e67e22", "#e67e22", "#c0392b", "#c0392b"]))
+    nat = logic.map_points(gap)
+    tests.append((92, (nat["width"], nat["height"], len(nat["points"])), (1000, 1240, 230)))
+    tests.append((93, nat["points"][0], {"x": 268, "y": 466, "color": "#7f9fc5", "sido": "충청남도", "sigungu": "공주시", "lacking_count": 0}))
+    tests.append((94, nat["points"][-1], {"x": 60, "y": 853, "color": "#c0392b", "sido": "전남광주통합특별시", "sigungu": "신안군", "lacking_count": 5}))
+    seoul = logic.map_points(gap, "서울특별시")
+    tests.append((95, (seoul["width"], seoul["height"], len(seoul["points"])), (1000, 826, 25)))
+    tests.append((96, (seoul["points"][0], seoul["points"][-1]), ({"x": 97, "y": 524, "color": "#7f9fc5", "sido": "서울특별시", "sigungu": "양천구", "lacking_count": 0}, {"x": 334, "y": 713, "color": "#c0392b", "sido": "서울특별시", "sigungu": "관악구", "lacking_count": 4})))
+    tests.append((97, logic.map_points(gap, "세종특별자치시"), {"width": 1000, "height": 300, "points": [{"x": 500, "y": 150, "color": "#e67e22", "sido": "세종특별자치시", "sigungu": "세종시", "lacking_count": 2}]}))
+    incheon_map = logic.map_points(gap, "인천광역시")
+    tests.append((98, (incheon_map["height"], incheon_map["points"][-1]["sigungu"], incheon_map["points"][-1]["x"], incheon_map["points"][-1]["y"]), (478, "미추홀구", 889, 367)))
+    tests.append((99, logic.map_points(gap, "없는도"), {"width": 1000, "height": 300, "points": []}))
+    nat_svg = logic.build_map_svg(nat)
+    tests.append((100, (nat_svg.startswith('<svg viewBox="0 0 1000 1240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="점 지도">'), nat_svg.endswith("</svg>")), (True, True)))
+    tests.append((101, (nat_svg.count("<circle"), nat_svg.count("<a href="), nat_svg.count("<text")), (230, 230, 0)))
+    tests.append((102, '<a href="/region?region=' + quote("전남광주통합특별시|신안군") + '">' in nat_svg, True))
+    tests.append((103, '<circle cx="60" cy="853" r="9" fill="#c0392b"><title>전남광주통합특별시 신안군 · 부족 5개</title></circle>' in nat_svg, True))
+    seoul_svg = logic.build_map_svg(seoul, True)
+    tests.append((104, (seoul_svg.startswith('<svg viewBox="0 0 1000 826"'), seoul_svg.count("<circle"), seoul_svg.count("<text")), (True, 25, 25)))
+    tests.append((105, '<circle cx="334" cy="713" r="22" fill="#c0392b"><title>서울특별시 관악구 · 부족 4개</title></circle>' in seoul_svg, True))
+    tests.append((106, '<text x="362" y="723" font-size="30">관악구</text>' in seoul_svg, True))
+    empty_svg = logic.build_map_svg(logic.map_points(gap, "없는도"), True)
+    tests.append((107, (empty_svg.startswith('<svg viewBox="0 0 1000 300"'), empty_svg.endswith("</svg>"), empty_svg.count("<circle")), (True, True, 0)))
 
     for num, actual, expected in tests:
         if actual == expected:
