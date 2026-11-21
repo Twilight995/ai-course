@@ -1,5 +1,6 @@
 import csv
 import re
+import statistics
 
 def load_library(path="data/library_gap.csv"):
     rows = []
@@ -116,3 +117,215 @@ def is_safe_summary(text, card):
         if float(num_str) not in allowed_numbers:
             return False
     return True
+
+def gap_card(rows, sido, sigungu):
+    if not sido:
+        return (None, "시도를 선택해주세요")
+    if not sigungu:
+        return (None, "시군구를 선택해주세요")
+    
+    row = None
+    for r in rows:
+        if r["sido"] == sido and r["sigungu"] == sigungu:
+            row = r
+            break
+    
+    if row is None:
+        return (None, "등록된 지역 정보가 없습니다")
+    
+    medians = gap_medians(rows)
+    domains_list = []
+    lacking_names = []
+    
+    for domain in GAP_DOMAINS:
+        key = domain["key"]
+        name = domain["name"]
+        level = row["level_" + key]
+        
+        basis = domain["basis"]
+        if key == "access" and row.get("access_source") == "직선거리(2026)":
+            basis = BASIS_ACCESS_NEW
+            
+        items = []
+        for item_info in domain["items"]:
+            item_key, label, unit = item_info
+            val = row[item_key]
+            items.append({
+                "label": label,
+                "value": show_number(val),
+                "unit": unit,
+                "median": show_number(medians[item_key]),
+                "raw": val
+            })
+            
+        lines = []
+        if level == "경계":
+            lines.append("기준선 가까이 있어 판정을 붙이지 않았습니다.")
+        if key == "access" and row.get("no_delivery_room") == 1:
+            lines.append("이 지역 안에는 분만 가능한 기관이 없습니다.")
+        if key == "access" and row.get("no_er") == 1:
+            lines.append("이 지역 안에는 지정 응급의료기관이 없습니다.")
+            
+        domains_list.append({
+            "key": key,
+            "name": name,
+            "level": level,
+            "basis": basis,
+            "items": items,
+            "lines": lines
+        })
+        
+        if level == "부족":
+            lacking_names.append(name)
+            
+    card = {
+        "sido": row["sido"],
+        "sigungu": row["sigungu"],
+        "pop": row["pop"],
+        "lacking_count": row["lacking_count"],
+        "unsure_count": row["unsure_count"],
+        "cluster_name": row["cluster_name"],
+        "cluster_unsure": row["cluster_unsure"],
+        "library_region": row["library_region"],
+        "domains": domains_list,
+        "lacking_names": lacking_names
+    }
+    
+    return (card, None)
+
+BASIS_ACCESS = "정부 기준(응급실 30분·분만실 60분·소아청소년과 60분 안에 못 가는 주민 비율 중 가장 큰 값). 50% 이상이면 부족, 10% 미만이면 넉넉"
+BASIS_ACCESS_NEW = "새로 생긴 구라 정부 값이 없어, 직접 잰 직선거리 기준(응급 10km·분만 20km·소아청소년과 10km 밖 주민 비율)으로 대신함. 잣대가 달라 기준선(50%, 10%) 가까이 있으면 판정을 붙이지 않음"
+BASIS_PEER = "인구 구조가 비슷한 지역과 견준 판정"
+BASIS_NATION = "전국 230곳과 견준 판정"
+
+# 영역 7개. items 는 (자료의 칸 이름, 화면에 쓸 이름표, 단위) 이다. 이름표에는 숫자를 쓰지 않는다.
+GAP_DOMAINS = [
+    {"key": "access", "name": "의료거리", "basis": BASIS_ACCESS, "items": [
+        ("access_pct", "응급실·분만실·소아청소년과에 제때 가기 어려운 주민 비율", "%"),
+    ]},
+    {"key": "medical", "name": "의료자원", "basis": BASIS_PEER, "items": [
+        ("doctors_per_1k", "주민 천 명당 의사 수", "명"),
+        ("clinic_per_10k", "주민 만 명당 의원 수", "곳"),
+        ("pharmacy_per_10k", "주민 만 명당 약국 수", "곳"),
+        ("pediatric_per_child_10k", "아동 만 명당 소아청소년과 수", "곳"),
+        ("obgyn_per_100k", "주민 십만 명당 산부인과 수", "곳"),
+    ]},
+    {"key": "elder", "name": "노인돌봄", "basis": BASIS_NATION, "items": [
+        ("home_care_per_old_1k", "노인 천 명당 재가노인복지시설 수", "곳"),
+        ("care_home_per_old_1k", "노인 천 명당 노인요양시설 수", "곳"),
+        ("senior_center_per_old_10k", "노인 만 명당 노인복지관 수", "곳"),
+    ]},
+    {"key": "infant", "name": "영유아보육", "basis": BASIS_PEER, "items": [
+        ("daycare_seats_per_infant_100", "영유아 백 명당 어린이집 정원", "명"),
+        ("public_daycare_seat_share", "국공립 어린이집 정원 비율", "%"),
+    ]},
+    {"key": "child", "name": "아동돌봄", "basis": BASIS_PEER, "items": [
+        ("child_center_per_child_10k", "아동 만 명당 지역아동센터 수", "곳"),
+        ("care_center_per_child_10k", "아동 만 명당 다함께돌봄센터 수", "곳"),
+    ]},
+    {"key": "disabled", "name": "장애인·복지", "basis": BASIS_NATION, "items": [
+        ("disabled_fac_per_disabled_1k", "등록장애인 천 명당 장애인 시설 수", "곳"),
+        ("welfare_center_per_recipient_10k", "기초수급자 만 명당 사회복지관 수", "곳"),
+    ]},
+    {"key": "library", "name": "도서관", "basis": BASIS_PEER, "items": [
+        ("lib_per_100k", "주민 십만 명당 공공도서관 수", "곳"),
+        ("librarians_per_100k", "주민 십만 명당 사서 수", "명"),
+    ]},
+]
+
+def gap_medians(rows):
+    medians = {}
+    for domain in GAP_DOMAINS:
+        for item in domain["items"]:
+            key = item[0]
+            values = [row[key] for row in rows if key in row]
+            if values:
+                medians[key] = statistics.median(values)
+    return medians
+
+def load_gap(path="data/welfare_gap.csv"):
+    rows = []
+    str_cols = ["sido", "sigungu", "level_access", "level_medical", "level_elder", "level_infant", "level_child", "level_disabled", "level_library", "access_source", "cluster_name", "library_region"]
+    int_cols = ["pop", "map_x", "map_y", "lacking_count", "unsure_count", "no_er", "no_delivery_room", "cluster_unsure", "small_pop", "new_gu", "few_cells"]
+    with open(path, mode="r", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            new_row = {}
+            for key, value in row.items():
+                if key in str_cols:
+                    new_row[key] = value
+                elif key in int_cols:
+                    new_row[key] = int(value)
+                else:
+                    new_row[key] = float(value)
+            rows.append(new_row)
+    return rows
+
+def show_number(value):
+    if value == 0:
+        return "0"
+    elif value < 1:
+        return f"{value:.2f}"
+    else:
+        return f"{value:.1f}"
+
+def gap_notices(rows, card):
+    row = None
+    for r in rows:
+        if r["sido"] == card["sido"] and r["sigungu"] == card["sigungu"]:
+            row = r
+            break
+    
+    if row is None:
+        return []
+        
+    notices = []
+    
+    if row.get("small_pop") == 1:
+        notices.append("주민이 3만 명보다 적어, 시설 한 곳 차이로 숫자가 크게 달라집니다.")
+        
+    if row.get("new_gu") == 1:
+        notices.append("2026년에 새로 생긴 구입니다. 어린이집·기초연금 등 일부 값은 옛 구의 값을 인구 비율로 나눈 추정입니다.")
+        
+    if row.get("few_cells") == 1:
+        notices.append("면적이 좁아 거리 값이 거칠게 계산됐습니다.")
+        
+    for domain in card.get("domains", []):
+        if domain.get("level") == "넉넉" and domain.get("key") != "access":
+            for item in domain.get("items", []):
+                if item.get("raw") == 0:
+                    notices.append(f"{domain['name']} 영역은 넉넉으로 나왔지만 '{item['label']}' 값은 0입니다. 다른 지표가 높아 넉넉이 된 것입니다.")
+                    
+    if row.get("level_access") == "넉넉" and row.get("no_delivery_room") == 1:
+        notices.append("의료거리는 차로 가는 시간 기준이라 넉넉으로 나왔습니다. 분만하려면 다른 지역으로 가야 합니다.")
+        
+    return notices
+
+def top_lacking(rows, n=10):
+    sorted_rows = sorted(rows, key=lambda x: (-x["lacking_count"], -x["pop"]))
+    result = []
+    for row in sorted_rows[:n]:
+        result.append({
+            "sido": row["sido"],
+            "sigungu": row["sigungu"],
+            "lacking_count": row["lacking_count"],
+            "unsure_count": row["unsure_count"],
+            "pop": row["pop"]
+        })
+    return result
+
+def sido_regions(rows, sido):
+    filtered = [row for row in rows if row["sido"] == sido]
+    if not filtered:
+        return []
+    sorted_rows = sorted(filtered, key=lambda x: (-x["lacking_count"], x["sigungu"]))
+    result = []
+    for row in sorted_rows:
+        result.append({
+            "sido": row["sido"],
+            "sigungu": row["sigungu"],
+            "lacking_count": row["lacking_count"],
+            "unsure_count": row["unsure_count"],
+            "pop": row["pop"]
+        })
+    return result
