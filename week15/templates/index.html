@@ -63,12 +63,9 @@
 <body>
     <div class="container">
         <h1>우리 지역 공공데이터 요약</h1>
-        <nav>
-            <a href="/">도서관</a>
-            <a href="/smoking">금연 지원</a>
-        </nav>
+        <p><a href="/">← 격차맵으로</a></p>
 
-        <form method="get" action="/">
+        <form method="get" action="/library">
             <select name="region">
                 <option value="">지역 선택</option>
                 {% for sido, sigungus in groups %}
@@ -101,6 +98,8 @@
             <p>{{ summary }}</p>
         </div>
         {% endif %}
+
+        <p>1~5단계에서 만든 화면이며, 지자체가 공공데이터포털에 낸 자료 기준입니다.</p>
     </div>
 </body>
 </html>

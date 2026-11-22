@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공공복지격차맵</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 20px; font-size: 16px; }
+        .container { max-width: 480px; margin: 0 auto; }
+        svg { width: 100%; height: auto; background: #f4f6f8; }
+        select, button { height: 44px; font-size: 16px; }
+        .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
+        li { margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>공공복지격차맵</h1>
+        <p>우리 지역의 의료·돌봄·도서관, 다른 곳과 견주면?</p>
+        
+        {% if sido %}
+        <h2>{{ sido }}</h2>
+        <p><a href="/">← 전국 지도로</a></p>
+        {% endif %}
+
+        {{ map_svg|safe }}
+
+        <p>
+            <span class="dot" style="background:#c0392b"></span> 부족 4개 이상 
+            <span class="dot" style="background:#e67e22"></span> 2~3개 
+            <span class="dot" style="background:#7f9fc5"></span> 0~1개
+        </p>
+
+        <form method="get" action="/">
+            <select name="sido">
+                <option value="">시도 선택</option>
+                {% for s in sido_list %}
+                <option value="{{ s }}" {% if s == sido %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">보기</button>
+        </form>
+
+        {% if message %}
+        <p>{{ message }}</p>
+        {% endif %}
+
+        {% if sido %}
+        <h2>{{ sido }}의 시군구</h2>
+        {% else %}
+        <h2>부족한 영역이 많은 곳</h2>
+        {% endif %}
+
+        <ol>
+            {% for r in regions %}
+                {% if sido %}
+                <li><a href="/region?region={{ (r.sido ~ '|' ~ r.sigungu)|urlencode }}">{{ r.sido }} {{ r.sigungu }}</a> · 부족 {{ r.lacking_count }}개 · 경계 {{ r.unsure_count }}개</li>
+                {% else %}
+                <li><a href="/region?region={{ (r.sido ~ '|' ~ r.sigungu)|urlencode }}">{{ r.sido }} {{ r.sigungu }}</a> · 부족 {{ r.lacking_count }}개</li>
+                {% endif %}
+            {% endfor %}
+        </ol>
+
+        <p>판정은 2022년 이후 공공데이터를 인구에 견준 값이며, 시설의 질이나 실제 이용 편의는 담지 못합니다.</p>
+    </div>
+</body>
+</html>
