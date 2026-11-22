@@ -416,7 +416,10 @@ def build_map_svg(map_data, big=False):
         res += f'<a href="/region?region={region}">'
         res += f'<circle cx="{p["x"]}" cy="{p["y"]}" r="{r}" fill="{p["color"]}"><title>{p["sido"]} {p["sigungu"]} · 부족 {p["lacking_count"]}개</title></circle>'
         if big:
-            res += f'<text x="{p["x"] + 28}" y="{p["y"] + 10}" font-size="30">{p["sigungu"]}</text>'
+            if p["x"] > 780:
+                res += f'<text x="{p["x"] - 28}" y="{p["y"] + 10}" font-size="30" text-anchor="end">{p["sigungu"]}</text>'
+            else:
+                res += f'<text x="{p["x"] + 28}" y="{p["y"] + 10}" font-size="30">{p["sigungu"]}</text>'
         res += '</a>'
     res += '</svg>'
     return res
@@ -452,4 +455,15 @@ def is_safe_gap_summary(text, card):
         if domain["name"] in text and domain.get("level") != "부족":
             return False
 
+    return True
+
+
+def is_good_gap_summary(text, card):
+    if not is_safe_gap_summary(text, card):
+        return False
+    numbers = re.findall(r"\d+(?:\.\d+)?", text)
+    if "7" not in numbers:
+        return False
+    if card["lacking_count"] > 0 and str(card["lacking_count"]) not in numbers:
+        return False
     return True

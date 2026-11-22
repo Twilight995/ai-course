@@ -38,7 +38,7 @@ def home():
 def make_gap_summary(card):
     try:
         answer = ask_gemma(logic.build_gap_prompt(card))
-        if logic.is_safe_gap_summary(answer, card):
+        if logic.is_good_gap_summary(answer, card):
             return (answer.strip(), "AI 요약")
         else:
             return (logic.gap_fallback_summary(card), "기본 요약")

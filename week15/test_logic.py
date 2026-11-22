@@ -235,6 +235,11 @@ def run_tests():
     tests.append((123, "- [노인돌봄] 노인 만 명당 노인복지관 수: 0곳" in gprompt, True))
     tests.append((124, ("의료자원" in gprompt, "아동돌봄" in gprompt), (False, False)))
     tests.append((125, ("부족으로 나온 영역이 없다" in logic.build_gap_prompt(jcard), "[" in logic.build_gap_prompt(jcard)), (True, False)))
+    tests.append((126, (logic.is_good_gap_summary(logic.gap_fallback_summary(gcard), gcard), logic.is_good_gap_summary(logic.gap_fallback_summary(jcard), jcard)), (True, True)))
+    tests.append((127, (logic.is_good_gap_summary("x", gcard), logic.is_good_gap_summary("잘 모르겠습니다.", gcard), logic.is_good_gap_summary("신안군은 살기 좋은 곳입니다.", gcard)), (False, False, False)))
+    tests.append((128, (logic.is_good_gap_summary("신안군은 7개 영역 가운데 5개가 부족합니다.", gcard), logic.is_good_gap_summary("신안군은 5개가 부족합니다.", gcard), logic.is_good_gap_summary("7개 영역 가운데 부족한 곳이 많습니다.", gcard)), (True, False, False)))
+    tests.append((129, (logic.is_good_gap_summary("신안군은 7개 영역 가운데 5개가 부족합니다. 제때 가기 어려운 주민이 99%입니다.", gcard), logic.is_good_gap_summary("부족한 영역이 없습니다.", jcard)), (False, False)))
+    tests.append((130, '<text x="922" y="470" font-size="30" text-anchor="end">강동구</text>' in seoul_svg, True))
 
     for num, actual, expected in tests:
         if actual == expected:

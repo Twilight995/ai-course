@@ -10,6 +10,7 @@
 | 7단계 | 점의 색(dot_color), 전국·시도 지도의 점 자리(map_points), 점 지도 그림(build_map_svg). Gemma4가 build_map_svg 를 map_points 한가운데에 넣어 문법 오류 → 함수 자리를 맨 아래로 옮기고 들여쓰기를 고친 뒤 통과 | python test_logic.py | 통과 107 / 전체 107 | 2026. 11. 21. |
 | 8단계 | 격차 요약의 기본 문장(gap_fallback_summary), 요약문 검사 3가지(is_safe_gap_summary), Gemma4 프롬프트(build_gap_prompt). 첫 시도에서 Gemma4가 테스트 파일의 따옴표를 \" 로 써서 문법 오류 → 되돌리고 작업을 셋으로 나눠 다시 함 | python test_logic.py | 통과 125 / 전체 125 | 2026. 11. 22. |
 | 9단계 | 도서관 화면을 /library 로 옮기고 위쪽 탭 제거(test_app.py 1~5번은 주소만 고침), 첫 화면과 시도 화면(home.html), 지역 화면(region.html) | python test_app.py | 통과 29 / 전체 29 | 2026. 11. 22. |
+| 9단계 보완 | 화면 틀의 배경색·글자색 지정과 군더더기 글자 제거, 뜻 없는 요약문을 거르는 검사(is_good_gap_summary) 추가, 지도 오른쪽 끝 점의 이름이 잘리지 않게 고침. Gemma4가 파일 가운데를 고치면서 줄 번호("8 \| ")를 함께 써 넣어 세 파일이 깨짐 → 되돌리고, 있던 줄을 바꾸는 일은 사람이 하고 새 함수만 Gemma4가 파일 끝에 붙임 | python test_logic.py, python test_app.py | 통과 130 / 전체 130, 통과 32 / 전체 32 | 2026. 11. 22. |
  
  ## 5단계 스마트폰 확인표
  

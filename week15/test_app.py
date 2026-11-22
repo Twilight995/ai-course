@@ -83,6 +83,10 @@ tests.append((27, "지역을 선택해주세요" in client.get("/region").get_da
 tests.append((28, "시군구를 선택해주세요" in client.get("/region", query_string={"region": "인천광역시|"}).get_data(as_text=True), True))
 wrong_body = client.get("/region", query_string={"region": "경상남도|신안군"}).get_data(as_text=True)
 tests.append((29, ("등록된 지역 정보가 없습니다" in wrong_body, "AI 요약" in wrong_body, "<script" in sinan_body, "<nav" in sinan_body), (True, False, False, False)))
+tests.append((30, "요약:" in sinan_body, False))
+tests.append((31, ("background-color: #ffffff" in home_body, "background-color: #ffffff" in sinan_body), (True, True)))
+app.ask_gemma = lambda prompt: "잘 모르겠습니다."
+tests.append((32, "기본 요약" in client.get("/region", query_string=SINAN).get_data(as_text=True), True))
 
 passed = 0
 for num, actual, expected in tests:
