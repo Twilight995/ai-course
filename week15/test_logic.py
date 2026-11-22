@@ -214,6 +214,27 @@ def run_tests():
     tests.append((106, '<text x="362" y="723" font-size="30">관악구</text>' in seoul_svg, True))
     empty_svg = logic.build_map_svg(logic.map_points(gap, "없는도"), True)
     tests.append((107, (empty_svg.startswith('<svg viewBox="0 0 1000 300"'), empty_svg.endswith("</svg>"), empty_svg.count("<circle")), (True, True, 0)))
+    jcard = logic.gap_card(gap, "인천광역시", "제물포구")[0]
+    tests.append((108, logic.gap_fallback_summary(gcard), "신안군의 7개 영역 가운데 5개가 부족으로 나왔습니다. 부족한 영역은 의료거리, 노인돌봄, 영유아보육, 장애인·복지, 도서관입니다."))
+    tests.append((109, logic.gap_fallback_summary(jcard), "제물포구의 7개 영역 가운데 부족으로 나온 영역은 없습니다."))
+    tests.append((110, len(logic.gap_fallback_summary(gcard)) <= 200, True))
+    tests.append((111, "7" in logic.gap_fallback_summary(jcard), True))
+    tests.append((112, logic.is_safe_gap_summary(logic.gap_fallback_summary(gcard), gcard), True))
+    tests.append((113, logic.is_safe_gap_summary(logic.gap_fallback_summary(jcard), jcard), True))
+    tests.append((114, logic.is_safe_gap_summary("신안군은 7개 영역 가운데 5개가 부족합니다. 제때 가기 어려운 주민이 85.5%입니다.", gcard), True))
+    tests.append((115, logic.is_safe_gap_summary("신안군은 7개 영역 가운데 5개가 부족합니다. 제때 가기 어려운 주민이 99%입니다.", gcard), False))
+    tests.append((116, (logic.is_safe_gap_summary("재가노인복지시설이 0.84곳입니다.", gcard), logic.is_safe_gap_summary("재가노인복지시설이 0.841곳입니다.", gcard)), (True, False)))
+    tests.append((117, (logic.is_safe_gap_summary("신안군은 아동돌봄이 부족합니다.", gcard), logic.is_safe_gap_summary("제물포구는 도서관이 부족합니다.", jcard)), (False, False)))
+    tests.append((118, (logic.is_safe_gap_summary(None, gcard), logic.is_safe_gap_summary("  ", gcard)), (False, False)))
+    tests.append((119, logic.is_safe_gap_summary("가" * 201, gcard), False))
+
+    gprompt = logic.build_gap_prompt(gcard)
+    tests.append((120, ("전남광주통합특별시 신안군" in gprompt, "- 부족한 영역 수: 5" in gprompt), (True, True)))
+    tests.append((121, "- 부족한 영역: 의료거리, 노인돌봄, 영유아보육, 장애인·복지, 도서관" in gprompt, True))
+    tests.append((122, "- [의료거리] 응급실·분만실·소아청소년과에 제때 가기 어려운 주민 비율: 85.5%" in gprompt, True))
+    tests.append((123, "- [노인돌봄] 노인 만 명당 노인복지관 수: 0곳" in gprompt, True))
+    tests.append((124, ("의료자원" in gprompt, "아동돌봄" in gprompt), (False, False)))
+    tests.append((125, ("부족으로 나온 영역이 없다" in logic.build_gap_prompt(jcard), "[" in logic.build_gap_prompt(jcard)), (True, False)))
 
     for num, actual, expected in tests:
         if actual == expected:

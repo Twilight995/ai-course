@@ -119,6 +119,26 @@ def is_safe_summary(text, card):
             return False
     return True
 
+
+def build_gap_prompt(card):
+    if card["lacking_count"] == 0:
+        return f"{card['sido']} {card['sigungu']}의 공공복지 상황을 한국어 한 문장으로 말해줘.\n7개 영역 가운데 부족으로 나온 영역이 없다고 말해. 숫자는 7만 쓰고, 영역 이름은 쓰지 마."
+
+    lines = [
+        f"아래 정보만 써서 {card['sido']} {card['sigungu']}의 공공복지 상황을 한국어 두 문장으로 설명해줘.",
+        "첫 문장에는 7개 영역 가운데 몇 개가 부족으로 나왔는지와 부족한 영역의 이름을 말해.",
+        "둘째 문장에는 아래 지표 가운데 하나를 골라 그 숫자를 그대로 말해.",
+        "아래에 없는 숫자와 아래에 없는 영역 이름은 쓰지 마. 숫자를 바꾸거나 계산하지 마.",
+        f"- 부족한 영역 수: {card['lacking_count']}",
+        f"- 부족한 영역: {', '.join(card['lacking_names'])}"
+    ]
+
+    for domain in card.get("domains", []):
+        if domain.get("level") == "부족":
+            for item in domain.get("items", []):
+                lines.append(f"- [{domain['name']}] {item['label']}: {item['value']}{item['unit']}")
+
+    return "\n".join(lines)
 def gap_card(rows, sido, sigungu):
     if not sido:
         return (None, "시도를 선택해주세요")
@@ -400,3 +420,36 @@ def build_map_svg(map_data, big=False):
         res += '</a>'
     res += '</svg>'
     return res
+
+def gap_fallback_summary(card):
+    if card["lacking_count"] == 0:
+        return f"{card['sigungu']}의 7개 영역 가운데 부족으로 나온 영역은 없습니다."
+    else:
+        names = ", ".join(card["lacking_names"])
+        return f"{card['sigungu']}의 7개 영역 가운데 {card['lacking_count']}개가 부족으로 나왔습니다. 부족한 영역은 {names}입니다."
+
+def is_safe_gap_summary(text, card):
+    if text is None:
+        return False
+    if not text.strip():
+        return False
+    if len(text) > 200:
+        return False
+
+    allowed = {"7", str(card["lacking_count"])}
+    for domain in card.get("domains", []):
+        if domain.get("level") == "부족":
+            for item in domain.get("items", []):
+                allowed.add(item["value"])
+
+    import re
+    numbers_in_text = re.findall(r"\d+(?:\.\d+)?", text)
+    for num in numbers_in_text:
+        if num not in allowed:
+            return False
+
+    for domain in card.get("domains", []):
+        if domain["name"] in text and domain.get("level") != "부족":
+            return False
+
+    return True
