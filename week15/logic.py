@@ -359,6 +359,23 @@ def dot_color(lacking_count):
     else:
         return "#7f9fc5"
 
+
+def build_area_map_svg(rows, paths, views, sido="", domain=""):
+    view = views[sido] if sido else views["전국"]
+    w = float(view["w"])
+    by_key = {(row["sido"], row["sigungu"]): row for row in rows}
+    res = f'<svg viewBox="{view["x"]} {view["y"]} {view["w"]} {view["h"]}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="시군구 색칠 지도">'
+    texts = ""
+    for p in paths:
+        if sido and p["sido"] != sido:
+            continue
+        row = by_key[(p["sido"], p["sigungu"])]
+        region = quote(p["sido"] + "|" + p["sigungu"])
+        d = p["d_low"] if not sido else p["d_high"]
+        res += f'<a href="/region?region={region}"><path d="{d}" fill="{area_color(row, domain)}" stroke="#ffffff" stroke-width="{w * 0.003:.2f}" fill-rule="evenodd"><title>{p["sido"]} {p["sigungu"]} · 부족 {row["lacking_count"]}개</title></path></a>'
+        if sido:
+            texts += f'<text x="{p["label_x"]}" y="{p["label_y"]}" font-size="{w * 0.028:.2f}" text-anchor="middle" fill="#ffffff" stroke="#1b1f24" stroke-width="{w * 0.007:.2f}" paint-order="stroke" font-weight="700" pointer-events="none">{p["sigungu"]}</text>'
+    return res + texts + "</svg>"
 def map_points(rows, sido=None):
     if sido is None:
         target_rows = rows
@@ -467,3 +484,33 @@ def is_good_gap_summary(text, card):
     if card["lacking_count"] > 0 and str(card["lacking_count"]) not in numbers:
         return False
     return True
+
+AREA_LEVEL_COLORS = {"부족": "#c0392b", "경계": "#7a828c", "비슷": "#b7791f", "넉넉": "#2e7d5b"}
+
+def load_map_paths(path="data/map_paths.csv"):
+    paths = []
+    with open(path, mode="r", encoding="utf-8-sig", newline="") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            paths.append(row)
+    return paths
+
+def load_map_views(path="data/map_views.csv"):
+    views = {}
+    with open(path, mode="r", encoding="utf-8-sig", newline="") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            views[row["name"]] = row
+    return views
+
+def area_color(row, domain=""):
+    if domain != "":
+        return AREA_LEVEL_COLORS[row["level_" + domain]]
+    else:
+        lacking_count = int(row["lacking_count"])
+        if lacking_count >= 4:
+            return "#c0392b"
+        elif lacking_count in [2, 3]:
+            return "#e67e22"
+        else:
+            return "#5b82b5"
