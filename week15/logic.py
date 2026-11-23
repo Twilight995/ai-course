@@ -514,3 +514,48 @@ def area_color(row, domain=""):
             return "#e67e22"
         else:
             return "#5b82b5"
+
+def home_view(rows, paths, views, sido="", domain=""):
+    sido_list = get_sido_list(rows)
+    
+    domain_keys = [d["key"] for d in GAP_DOMAINS]
+    if domain not in domain_keys:
+        domain = ""
+        
+    message = None
+    
+    if sido not in sido_list:
+        if sido != "":
+            message = "등록된 지역 정보가 없습니다"
+        else:
+            message = "지역을 선택해주세요"
+        sido = ""
+        
+    if sido != "":
+        regions = sido_regions(rows, sido)
+    else:
+        regions = top_lacking(rows)
+        
+    if domain != "":
+        name = ""
+        for d in GAP_DOMAINS:
+            if d["key"] == domain:
+                name = d["name"]
+                break
+        legend = [("#c0392b", "부족"), ("#7a828c", "경계"), ("#b7791f", "비슷"), ("#2e7d5b", "넉넉")]
+        map_note = f"{name} 영역의 판정으로 칠했습니다. 구역을 누르면 그 지역으로 갑니다."
+    else:
+        legend = [("#c0392b", "부족 4개 이상"), ("#e67e22", "부족 2~3개"), ("#5b82b5", "부족 0~1개")]
+        map_note = "7개 영역 가운데 부족한 영역의 수로 칠했습니다. 구역을 누르면 그 지역으로 갑니다."
+        
+    return {
+        "sido_list": sido_list,
+        "sido": sido,
+        "domain": domain,
+        "domains": GAP_DOMAINS,
+        "map_svg": build_area_map_svg(rows, paths, views, sido, domain),
+        "legend": legend,
+        "map_note": map_note,
+        "regions": regions,
+        "message": message
+    }

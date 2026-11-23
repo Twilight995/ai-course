@@ -258,6 +258,16 @@ def run_tests():
     tests.append((141, (seoul_area.startswith('<svg viewBox="300.0 169.0 60.5 50.8"'), seoul_area.count("<path"), seoul_area.count("<text")), (True, 25, 25)))
     tests.append((142, '<text x="325.8" y="208.6" font-size="1.69" text-anchor="middle" fill="#ffffff" stroke="#1b1f24" stroke-width="0.42" paint-order="stroke" font-weight="700" pointer-events="none">관악구</text>' in seoul_area, True))
     tests.append((143, 'fill="#c0392b" stroke="#ffffff" stroke-width="0.18" fill-rule="evenodd"><title>서울특별시 관악구 · 부족 4개</title>' in seoul_area, True))
+    hv = logic.home_view(gap, mpaths, mviews)
+    tests.append((144, (hv["sido"], hv["domain"], hv["message"], len(hv["regions"]), len(hv["sido_list"]), len(hv["domains"])), ("", "", "지역을 선택해주세요", 10, 16, 7)))
+    tests.append((145, (hv["legend"], hv["map_note"]), ([("#c0392b", "부족 4개 이상"), ("#e67e22", "부족 2~3개"), ("#5b82b5", "부족 0~1개")], "7개 영역 가운데 부족한 영역의 수로 칠했습니다. 구역을 누르면 그 지역으로 갑니다.")))
+    tests.append((146, hv["map_svg"] == amap, True))
+    hv2 = logic.home_view(gap, mpaths, mviews, "서울특별시", "library")
+    tests.append((147, (hv2["sido"], hv2["domain"], hv2["message"], len(hv2["regions"]), hv2["regions"][0]["sigungu"]), ("서울특별시", "library", None, 25, "관악구")))
+    tests.append((148, (hv2["legend"], hv2["map_note"]), ([("#c0392b", "부족"), ("#7a828c", "경계"), ("#b7791f", "비슷"), ("#2e7d5b", "넉넉")], "도서관 영역의 판정으로 칠했습니다. 구역을 누르면 그 지역으로 갑니다.")))
+    tests.append((149, hv2["map_svg"] == logic.build_area_map_svg(gap, mpaths, mviews, "서울특별시", "library"), True))
+    hv3 = logic.home_view(gap, mpaths, mviews, "없는도", "없는영역")
+    tests.append((150, (hv3["sido"], hv3["domain"], hv3["message"], len(hv3["regions"])), ("", "", "등록된 지역 정보가 없습니다", 10)))
 
     for num, actual, expected in tests:
         if actual == expected:
