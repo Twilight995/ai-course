@@ -4,45 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>공공복지격차맵</title>
-    <style>
-      body { font-family: sans-serif; margin: 0; padding: 20px; font-size: 16px; background-color: #ffffff; color: #111111;}
-      .container { max-width: 480px; margin: 0 auto; }
-      .card { border-left: 8px solid; padding: 12px 15px; background-color: #f9f9f9; margin-bottom: 16px; }
-      .card h2 { margin: 0 0 8px 0; font-size: 1.1rem; }
-      .card p { margin: 4px 0; }
-      .basis { color: #555; font-size: 0.9rem; }
-      .summary { padding: 15px; border: 1px solid #ddd; margin-bottom: 20px; }
-    </style>
+    <style>html { background-color: #ffffff; }</style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    {% set colors = {'부족': '#c0392b', '경계': '#7a828c', '비슷': '#b7791f', '넉넉': '#2e7d5b'} %}
+    <div class="topbar"><a href="/">공공복지격차맵</a><span>우리 지역의 의료·돌봄·도서관, 다른 곳과 견주면?</span></div>
     <div class="container">
-        <p><a href="/">← 격차맵으로</a></p>
-        {% if message %}<p>{{ message }}</p>{% endif %}
+        {% if message %}
+        <div class="panel"><p>{{ message }}</p></div>
+        <div class="btn-row"><a class="btn" href="/">전국 지도로</a></div>
+        {% endif %}
         {% if card %}
-            <h1>{{ card.sido }} {{ card.sigungu }}</h1>
-            <p>인구 {{ "{:,}".format(card['pop']) }}명</p>
-            <p>7개 영역 중 {{ card.lacking_count }}개 부족, {{ card.unsure_count }}개 경계</p>
-            <p>유형: {{ card.cluster_name }}{% if card.cluster_unsure %} (두 유형의 중간에 가까움){% endif %}</p>
+        <h1>{{ card.sido }} {{ card.sigungu }}</h1>
+        <p class="muted">인구 {{ "{:,}".format(card['pop']) }}명 · 유형: {{ card.cluster_name }}{% if card.cluster_unsure %} (두 유형의 중간에 가까움){% endif %}</p>
 
-            <div class="summary"><strong>{{ summary_label }}</strong><p>{{ summary }}</p></div>
-
-            {% for d in card.domains %}
-            <div class="card" style="border-left-color: {% if d.level == '부족' %}#c0392b{% elif d.level == '경계' %}#888888{% elif d.level == '비슷' %}#d4a017{% else %}#2e8b57{% endif %};">
-              <h2>{{ d.name }} · {{ d.level }}</h2>
-              {% for i in d["items"] %}<p>{{ i.label }} {{ i.value }}{{ i.unit }} (전국 중앙값 {{ i.median }}{{ i.unit }})</p>{% endfor %}
-              {% for line in d.lines %}<p><strong>{{ line }}</strong></p>{% endfor %}
-              <p class="basis">{{ d.basis }}</p>
-              {% if d.key == 'library' and card.library_region %}<p><a href="/library?region={{ card.library_region|urlencode }}">도서관 자세히 보기</a></p>{% endif %}
+        <div class="panel">
+            <strong>7개 영역 중 {{ card.lacking_count }}개 부족, {{ card.unsure_count }}개 경계</strong>
+            <div class="chips">
+                {% for d in card.domains %}
+                <div class="chip"><span>{{ d.name }}</span><span class="badge" style="background-color: {{ colors[d.level] }};">{{ d.level }}</span></div>
+                {% endfor %}
             </div>
+        </div>
+
+        <div class="panel summary"><strong>{{ summary_label }}</strong><p>{{ summary }}</p></div>
+
+        {% for d in card.domains %}
+        <div class="card" style="border-left-color: {{ colors[d.level] }};">
+            <h2>{{ d.name }} · {{ d.level }}</h2>
+            {% for i in d["items"] %}
+            <div class="item" aria-label="{{ i.label }} {{ i.value }}{{ i.unit }} (전국 중앙값 {{ i.median }}{{ i.unit }})"><span class="label">{{ i.label }}</span><span class="value">{{ i.value }}{{ i.unit }}<small>전국 중앙값 {{ i.median }}{{ i.unit }}</small></span></div>
             {% endfor %}
+            {% for line in d.lines %}<p class="{% if '기준선' in line %}hint{% else %}alert{% endif %}">{{ line }}</p>{% endfor %}
+            <p class="basis">{{ d.basis }}</p>
+            {% if d.key == 'library' and card.library_region %}<div class="btn-row"><a class="btn btn-light" href="/library?region={{ card.library_region|urlencode }}">도서관 자세히 보기</a></div>{% endif %}
+        </div>
+        {% endfor %}
 
-            {% if notices %}
-            <h2>알아 둘 점</h2>
-            <ul>{% for n in notices %}<li>{{ n }}</li>{% endfor %}</ul>
-            {% endif %}
+        {% if notices %}
+        <div class="panel notice"><h2>알아 둘 점</h2><ul>{% for n in notices %}<li>{{ n }}</li>{% endfor %}</ul></div>
+        {% endif %}
 
-            <p><a href="/?sido={{ card.sido|urlencode }}">← {{ card.sido }} 지도로</a></p>
-            <p>판정은 2022년 이후 공공데이터를 인구에 견준 값이며, 시설의 질이나 실제 이용 편의는 담지 못합니다.</p>
+        <div class="btn-row">
+            <a class="btn btn-light" href="/?sido={{ card.sido|urlencode }}">← {{ card.sido }} 지도</a>
+            <a class="btn" href="/">전국 지도</a>
+        </div>
+        <p class="foot">판정은 2022년 이후 공공데이터를 인구에 견준 값이며, 시설의 질이나 실제 이용 편의는 담지 못합니다.</p>
         {% endif %}
     </div>
 </body>

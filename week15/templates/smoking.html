@@ -3,75 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>우리 지역 공공데이터 요약</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 16px;
-        }
-        .container {
-            width: 100%;
-            max-width: 480px;
-        }
-        h1 {
-            font-size: 1.5rem;
-        }
-        nav {
-            margin-bottom: 20px;
-        }
-        nav a {
-            margin-right: 15px;
-            text-decoration: none;
-            color: blue;
-        }
-        .description {
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #eee;
-        }
-    </style>
+    <title>금연 지원 · 공공복지격차맵</title>
+    <style>html { background-color: #ffffff; }</style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    <div class="topbar"><a href="/">공공복지격차맵</a><span>우리 지역의 의료·돌봄·도서관, 다른 곳과 견주면?</span></div>
     <div class="container">
-        <h1>우리 지역 공공데이터 요약</h1>
-        <p class="description">고의존 흡연자 1,000명당 금연캠프 이용 건수가 적은 순서입니다.</p>
+        <h1>금연 지원 (1~5단계 화면)</h1>
+        <p class="muted">고의존 흡연자 1,000명당 금연캠프 이용 건수가 적은 순서입니다.</p>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>순위</th>
-                    <th>지역</th>
-                    <th>고의존 비율</th>
-                    <th>1,000명당 캠프 이용</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in rows %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ row.region }}</td>
-                    <td>{{ row.high_pct }}%</td>
-                    <td>{% if row.camp_use == 0 %}이용 기록 없음{% else %}{{ row.camp_per_1000 }}{% endif %}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="panel">
+            <table>
+                <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>지역</th>
+                        <th>고의존 비율</th>
+                        <th>1,000명당 캠프 이용</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ row.region }}</td>
+                        <td>{{ row.high_pct }}%</td>
+                        <td>{% if row.camp_use == 0 %}이용 기록 없음{% else %}{{ row.camp_per_1000 }}{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="btn-row"><a class="btn btn-light" href="/">← 격차맵으로</a></div>
     </div>
 </body>
 </html>

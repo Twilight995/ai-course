@@ -1,0 +1,67 @@
+/* 공공복지격차맵 공통 꾸밈. 스마트폰 세로 화면 기준. JavaScript 와 외부 자료는 쓰지 않는다. */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif; font-size: 16px; line-height: 1.5; background-color: #f2f4f7; color: #1b1f24; }
+a { color: inherit; text-decoration: none; }
+
+/* 머리띠와 본문 틀 */
+.topbar { background-color: #1f3a5f; color: #ffffff; padding: 14px 16px; }
+.topbar a { font-size: 1.15rem; font-weight: 700; }
+.topbar span { display: block; font-size: 0.8rem; opacity: 0.85; }
+.container { max-width: 480px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 1.35rem; margin: 4px 0 8px 0; }
+h2 { font-size: 1.05rem; margin: 20px 0 10px 0; }
+.muted { color: #5b6470; font-size: 0.9rem; }
+.panel { background-color: #ffffff; border-radius: 14px; padding: 14px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
+.foot { margin: 18px 0 8px 0; color: #5b6470; font-size: 0.8rem; }
+
+/* 단추: 글자 링크 대신 누르는 자리가 보이게 */
+.btn { display: inline-block; min-height: 44px; padding: 10px 16px; border: 0; border-radius: 10px; background-color: #1f3a5f; color: #ffffff; font-size: 1rem; font-weight: 600; text-align: center; cursor: pointer; }
+.btn-light { background-color: #e6ebf2; color: #1f3a5f; }
+.btn-row { display: flex; gap: 8px; margin: 12px 0; }
+.btn-row .btn { flex: 1; }
+
+/* 고르는 줄 */
+.filters { display: flex; gap: 8px; margin: 0; }
+.filters select { flex: 1; min-width: 0; height: 44px; padding: 0 8px; border: 1px solid #c5ccd6; border-radius: 10px; background-color: #ffffff; font-size: 1rem; }
+.filters .btn { flex: 0 0 auto; }
+
+/* 지도 */
+.map svg { display: block; width: 100%; height: auto; margin-top: 12px; background-color: #eaf0f6; border-radius: 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 10px; font-size: 0.85rem; }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.dot { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+
+/* 목록: 한 줄 전체가 단추 */
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li { margin-bottom: 8px; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 52px; padding: 10px 14px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
+.row .name { font-weight: 600; }
+.row .side { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+.row .arrow { color: #9aa3ae; }
+
+/* 판정 딱지 */
+.badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; color: #ffffff; white-space: nowrap; }
+
+/* 지역 화면 */
+.chips { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+.chip { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background-color: #f2f4f7; border-radius: 10px; font-size: 0.9rem; }
+.card { background-color: #ffffff; border-radius: 14px; padding: 14px; margin-bottom: 12px; border-left: 6px solid #c5ccd6; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
+.card h2 { margin: 0 0 8px 0; }
+.card p { margin: 4px 0; }
+.item { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid #edf0f3; }
+.item .label { flex: 1; font-size: 0.92rem; }
+.item .value { flex: 0 0 auto; text-align: right; font-weight: 700; }
+.item .value small { display: block; font-weight: 400; color: #5b6470; font-size: 0.78rem; }
+.alert { margin: 8px 0 0 0; padding: 8px 10px; background-color: #fdecea; border-radius: 8px; font-size: 0.9rem; font-weight: 600; color: #8a2a20; }
+.hint { margin: 8px 0 0 0; padding: 8px 10px; background-color: #eef1f4; border-radius: 8px; font-size: 0.9rem; color: #4a525c; }
+.basis { margin: 8px 0 0 0; color: #5b6470; font-size: 0.82rem; }
+.summary strong { display: inline-block; margin-bottom: 4px; font-size: 0.8rem; color: #1f3a5f; background-color: #e6ebf2; padding: 2px 8px; border-radius: 999px; }
+.summary p { margin: 0; }
+.notice { background-color: #fff8e1; }
+.notice h2 { margin-top: 0; }
+.notice ul { margin: 0; padding-left: 18px; font-size: 0.9rem; }
+
+/* 금연 지원 표 */
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th, td { padding: 8px 6px; border-bottom: 1px solid #edf0f3; text-align: left; }
+th { background-color: #f2f4f7; }

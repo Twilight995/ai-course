@@ -21,19 +21,9 @@ def make_summary(card):
 
 @app.route("/")
 def home():
-    rows = logic.load_gap()
-    sido_list = logic.get_sido_list(rows)
-    sido = request.args.get("sido", "")
-    if sido in sido_list:
-        map_svg = logic.build_map_svg(logic.map_points(rows, sido), True)
-        regions = logic.sido_regions(rows, sido)
-        message = None
-    else:
-        map_svg = logic.build_map_svg(logic.map_points(rows))
-        regions = logic.top_lacking(rows)
-        message = "등록된 지역 정보가 없습니다" if sido else "지역을 선택해주세요"
-        sido = ""
-    return render_template("home.html", sido_list=sido_list, sido=sido, map_svg=map_svg, regions=regions, message=message)
+    view = logic.home_view(logic.load_gap(), logic.load_map_paths(), logic.load_map_views(),
+                           request.args.get("sido", ""), request.args.get("domain", ""))
+    return render_template("home.html", **view)
 
 def make_gap_summary(card):
     try:

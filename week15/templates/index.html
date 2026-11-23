@@ -3,103 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>우리 지역 공공데이터 요약</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 16px;
-        }
-        .container {
-            width: 100%;
-            max-width: 480px;
-        }
-        h1 {
-            font-size: 1.5rem;
-        }
-        nav {
-            margin-bottom: 20px;
-        }
-        nav a {
-            margin-right: 15px;
-            text-decoration: none;
-            color: blue;
-        }
-        form {
-            margin-bottom: 20px;
-        }
-        select, button {
-            height: 44px;
-            font-size: 16px;
-        }
-        .message {
-            margin: 10px 0;
-        }
-        .card {
-            border-left: 8px solid;
-            padding: 15px;
-            background-color: #f9f9f9;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .card h2 {
-            margin-top: 0;
-        }
-        .card p {
-            margin: 5px 0;
-        }
-        .summary-section {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-        }
-    </style>
+    <title>도서관 자세히 · 공공복지격차맵</title>
+    <style>html { background-color: #ffffff; }</style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    <div class="topbar"><a href="/">공공복지격차맵</a><span>우리 지역의 의료·돌봄·도서관, 다른 곳과 견주면?</span></div>
     <div class="container">
-        <h1>우리 지역 공공데이터 요약</h1>
-        <p><a href="/">← 격차맵으로</a></p>
+        <h1>도서관 자세히</h1>
 
-        <form method="get" action="/library">
-            <select name="region">
-                <option value="">지역 선택</option>
-                {% for sido, sigungus in groups %}
-                <optgroup label="{{ sido }}">
-                    {% for sigungu in sigungus %}
-                    <option value="{{ sido }}|{{ sigungu }}" {% if region == sido ~ '|' ~ sigungu %}selected{% endif %}>{{ sigungu }}</option>
+        <div class="panel">
+            <form class="filters" method="get" action="/library">
+                <select name="region" aria-label="지역">
+                    <option value="">지역 선택</option>
+                    {% for sido, sigungus in groups %}
+                    <optgroup label="{{ sido }}">
+                        {% for sigungu in sigungus %}
+                        <option value="{{ sido }}|{{ sigungu }}" {% if region == sido ~ '|' ~ sigungu %}selected{% endif %}>{{ sigungu }}</option>
+                        {% endfor %}
+                    </optgroup>
                     {% endfor %}
-                </optgroup>
-                {% endfor %}
-            </select>
-            <button type="submit">보기</button>
-        </form>
-
-        {% if message %}
-        <p class="message">{{ message }}</p>
-        {% endif %}
+                </select>
+                <button class="btn" type="submit">보기</button>
+            </form>
+            {% if message %}<p class="muted">{{ message }}</p>{% endif %}
+        </div>
 
         {% if card %}
-        <div class="card" style="border-left-color: {% if card.level == 'red' %}#d32f2f{% elif card.level == 'orange' %}#f57c00{% elif card.level == 'green' %}#388e3c{% endif %};">
+        <div class="card" style="border-left-color: {% if card.level == 'red' %}#c0392b{% elif card.level == 'orange' %}#e67e22{% else %}#2e7d5b{% endif %};">
             <h2>{{ card.sido }} {{ card.sigungu }}</h2>
-            <p>{{ card.level_text }}</p>
-            <p>전체 도서관 {{ card.total }}곳</p>
-            <p>대형 거점 {{ card.hub }}곳</p>
-            <p>동네 도서관 {{ card.small }}곳</p>
-            <p>주말 휴관 {{ card.weekend_closed_pct }}%</p>
+            <p><strong>{{ card.level_text }}</strong></p>
+            <div class="item"><span class="label">전체 도서관</span><span class="value">{{ card.total }}곳</span></div>
+            <div class="item"><span class="label">대형 거점</span><span class="value">{{ card.hub }}곳</span></div>
+            <div class="item"><span class="label">동네 도서관</span><span class="value">{{ card.small }}곳</span></div>
+            <div class="item"><span class="label">주말 휴관</span><span class="value">{{ card.weekend_closed_pct }}%</span></div>
         </div>
 
-        <div class="summary-section">
-            <strong>{{ summary_label }}</strong>
-            <p>{{ summary }}</p>
-        </div>
+        <div class="panel summary"><strong>{{ summary_label }}</strong><p>{{ summary }}</p></div>
         {% endif %}
 
-        <p>1~5단계에서 만든 화면이며, 지자체가 공공데이터포털에 낸 자료 기준입니다.</p>
+        <div class="btn-row"><a class="btn btn-light" href="/">← 격차맵으로</a></div>
+        <p class="foot">1~5단계에서 만든 화면이며, 지자체가 공공데이터포털에 낸 자료 기준입니다.</p>
     </div>
 </body>
 </html>
