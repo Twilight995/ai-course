@@ -11,3 +11,6 @@
 - 프롬프트에 없는 숫자나 사실은 만들지 않는다.
 - 예외(9단계에서만): 도서관 화면의 주소가 / 에서 /library 로 옮겨지므로 test_app.py 1~5번이 부르는 주소만 고친다. 기대값은 바꾸지 않는다.
 - 예외(12단계에서만): 점 지도를 색칠 지도로 바꾸므로 test_app.py 11·12·13·15·16·17번은 새 화면에 맞는 내용으로 바꾼다. test_logic.py 의 테스트는 바꾸지 않는다.
+- 14단계부터 logic.py, app.py, templates/, test_logic.py, test_app.py 는 고치지 않는다. 새 파이썬 테스트는 test_static.py 에 넣고 python test_static.py 로 실행한다.
+- JavaScript 는 view.js 와 summary.js 에만 쓴다. 외부 CSS·CDN 은 쓰지 않는다.
+- 예외(15단계에서만): fetch_summaries.py 가 data/gap_summaries.csv 를 새로 쓰는 것은 된다. data/ 의 다른 파일은 고치지 않는다.
