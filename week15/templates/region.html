@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    {% set colors = {'부족': '#c0392b', '경계': '#7a828c', '비슷': '#b7791f', '넉넉': '#2e7d5b'} %}
+    {% set colors = {'부족': '#c0392b', '경계': '#b7791f', '비슷': '#b7791f', '넉넉': '#2e7d5b'} %}
+    {% set labels = {'부족': '부족', '경계': '보통', '비슷': '보통', '넉넉': '넉넉'} %}
     <div class="topbar"><a href="/">공공복지격차맵</a><span>우리 지역의 의료·돌봄·도서관, 다른 곳과 견주면?</span></div>
     <div class="container">
         {% if message %}
@@ -20,10 +21,10 @@
         <p class="muted">인구 {{ "{:,}".format(card['pop']) }}명 · 유형: {{ card.cluster_name }}{% if card.cluster_unsure %} (두 유형의 중간에 가까움){% endif %}</p>
 
         <div class="panel">
-            <strong>7개 영역 중 {{ card.lacking_count }}개 부족, {{ card.unsure_count }}개 경계</strong>
+            <strong>7개 영역 중 {{ card.lacking_count }}개 부족</strong>
             <div class="chips">
                 {% for d in card.domains %}
-                <div class="chip"><span>{{ d.name }}</span><span class="badge" style="background-color: {{ colors[d.level] }};">{{ d.level }}</span></div>
+                <div class="chip"><span>{{ d.name }}</span><span class="badge" style="background-color: {{ colors[d.level] }};">{{ labels[d.level] }}</span></div>
                 {% endfor %}
             </div>
         </div>
@@ -32,7 +33,7 @@
 
         {% for d in card.domains %}
         <div class="card" style="border-left-color: {{ colors[d.level] }};">
-            <h2>{{ d.name }} · {{ d.level }}</h2>
+            <h2>{{ d.name }} · {{ labels[d.level] }}</h2>
             {% for i in d["items"] %}
             <div class="item" aria-label="{{ i.label }} {{ i.value }}{{ i.unit }} (전국 중앙값 {{ i.median }}{{ i.unit }})"><span class="label">{{ i.label }}</span><span class="value">{{ i.value }}{{ i.unit }}<small>전국 중앙값 {{ i.median }}{{ i.unit }}</small></span></div>
             {% endfor %}

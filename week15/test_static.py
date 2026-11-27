@@ -69,9 +69,9 @@ tests.append((16, (len(site["home"]), len(site["regions"]), len(site["colors"]),
 pieces = "".join(site["home"].values()) + "".join(site["regions"].values()) + site["missing"]
 tests.append((17, (pieces.count('href="/'), pieces.count("도서관 자세히"), pieces.count('<div class="panel summary" id="summary"><strong></strong><p></p></div>'), pieces.count('class="panel summary"')), (0, 0, 230, 230)))
 tests.append((18, (site["home"][""].count("<path"), site["home"]["서울특별시"].count("<path"), site["home"]["서울특별시"].startswith("<h1>서울특별시</h1>"), 'href="#region=' in site["home"][""]), (230, 25, True, True)))
-tests.append((19, site["colors"]["서울특별시|관악구"], {"": "#c0392b", "access": "#2e7d5b", "medical": "#c0392b", "elder": "#c0392b", "infant": "#2e7d5b", "child": "#7a828c", "disabled": "#c0392b", "library": "#c0392b"}))
-tests.append((20, (site["legends"]["access"]["note"], len(site["legends"][""]["legend"]), len(site["legends"]["access"]["legend"])), ("의료거리 영역의 판정으로 칠했습니다. 구역을 누르면 그 지역으로 갑니다.", 3, 4)))
-tests.append((21, ("등록된 지역 정보가 없습니다" in site["missing"], 'href="#"' in site["missing"], site["regions"]["전남광주통합특별시|신안군"].count('class="chip"'), "7개 영역 중 5개 부족, 1개 경계" in site["regions"]["전남광주통합특별시|신안군"]), (True, True, 7, True)))
+tests.append((19, site["colors"]["서울특별시|관악구"], {"": "#c0392b", "access": "#2e7d5b", "medical": "#c0392b", "elder": "#c0392b", "infant": "#2e7d5b", "child": "#b7791f", "disabled": "#c0392b", "library": "#c0392b"}))
+tests.append((20, (site["legends"]["access"]["note"], len(site["legends"][""]["legend"]), len(site["legends"]["access"]["legend"])), ("의료거리 영역의 판정으로 칠했습니다. 부족 → 보통 → 넉넉 순서입니다. 구역을 누르면 그 지역으로 갑니다.", 3, 3)))
+tests.append((21, ("등록된 지역 정보가 없습니다" in site["missing"], 'href="#"' in site["missing"], site["regions"]["전남광주통합특별시|신안군"].count('class="chip"'), "7개 영역 중 5개 부족</strong>" in site["regions"]["전남광주통합특별시|신안군"]), (True, True, 7, True)))
 tests.append((22, (site["summary"]["전남광주통합특별시|신안군"]["saved"], site["summary"]["전남광주통합특별시|신안군"]["saved_label"]), saved["전남광주통합특별시|신안군"]))
 tests.append((23, make_site.build_all({})["summary"]["전남광주통합특별시|신안군"]["saved"], FALLBACK))
 out = os.path.join(tempfile.gettempdir(), "site_data_test.js")

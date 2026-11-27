@@ -181,7 +181,7 @@ def gap_card(rows, sido, sigungu):
             
         lines = []
         if level == "경계":
-            lines.append("기준선 가까이 있어 판정을 붙이지 않았습니다.")
+            lines.append("기준선에 가까운 보통입니다. 계산에 따라 판정이 달라질 수 있습니다.")
         if key == "access" and row.get("no_delivery_room") == 1:
             lines.append("이 지역 안에는 분만 가능한 기관이 없습니다.")
         if key == "access" and row.get("no_er") == 1:
@@ -215,7 +215,7 @@ def gap_card(rows, sido, sigungu):
     return (card, None)
 
 BASIS_ACCESS = "정부 기준(응급실 30분·분만실 60분·소아청소년과 60분 안에 못 가는 주민 비율 중 가장 큰 값). 50% 이상이면 부족, 10% 미만이면 넉넉"
-BASIS_ACCESS_NEW = "새로 생긴 구라 정부 값이 없어, 직접 잰 직선거리 기준(응급 10km·분만 20km·소아청소년과 10km 밖 주민 비율)으로 대신함. 잣대가 달라 기준선(50%, 10%) 가까이 있으면 판정을 붙이지 않음"
+BASIS_ACCESS_NEW = "새로 생긴 구라 정부 값이 없어, 직접 잰 직선거리 기준(응급 10km·분만 20km·소아청소년과 10km 밖 주민 비율)으로 대신함. 잣대가 달라 기준선(50%, 10%) 가까이 있으면 보통으로 봄"
 BASIS_PEER = "인구 구조가 비슷한 지역과 견준 판정"
 BASIS_NATION = "전국 230곳과 견준 판정"
 
@@ -485,7 +485,7 @@ def is_good_gap_summary(text, card):
         return False
     return True
 
-AREA_LEVEL_COLORS = {"부족": "#c0392b", "경계": "#7a828c", "비슷": "#b7791f", "넉넉": "#2e7d5b"}
+AREA_LEVEL_COLORS = {"부족": "#c0392b", "경계": "#b7791f", "비슷": "#b7791f", "넉넉": "#2e7d5b"}
 
 def load_map_paths(path="data/map_paths.csv"):
     paths = []
@@ -542,8 +542,8 @@ def home_view(rows, paths, views, sido="", domain=""):
             if d["key"] == domain:
                 name = d["name"]
                 break
-        legend = [("#c0392b", "부족"), ("#7a828c", "경계"), ("#b7791f", "비슷"), ("#2e7d5b", "넉넉")]
-        map_note = f"{name} 영역의 판정으로 칠했습니다. 구역을 누르면 그 지역으로 갑니다."
+        legend = [("#c0392b", "부족"), ("#b7791f", "보통"), ("#2e7d5b", "넉넉")]
+        map_note = f"{name} 영역의 판정으로 칠했습니다. 부족 → 보통 → 넉넉 순서입니다. 구역을 누르면 그 지역으로 갑니다."
     else:
         legend = [("#c0392b", "부족 4개 이상"), ("#e67e22", "부족 2~3개"), ("#5b82b5", "부족 0~1개")]
         map_note = "7개 영역 가운데 부족한 영역의 수로 칠했습니다. 구역을 누르면 그 지역으로 갑니다."

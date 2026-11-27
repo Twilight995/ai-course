@@ -55,7 +55,7 @@ tests.append((13, ("인천광역시 미추홀구" in home_body, home_body.count(
 tests.append((14, ("부족 4개 이상" in home_body, "<nav" in home_body, "<script" in home_body), (True, False, False)))
 seoul_body = client.get("/", query_string={"sido": "서울특별시"}).get_data(as_text=True)
 tests.append((15, ('viewBox="300.0 169.0 60.5 50.8"' in seoul_body, seoul_body.count("<path"), "관악구</text>" in seoul_body), (True, 25, True)))
-tests.append((16, (seoul_body.count('class="row"'), "경계 1개" in seoul_body, "지역을 선택해주세요" in seoul_body), (25, True, False)))
+tests.append((16, (seoul_body.count('class="row"'), "경계" in seoul_body, "지역을 선택해주세요" in seoul_body), (25, False, False)))
 none_body = client.get("/", query_string={"sido": "없는도"}).get_data(as_text=True)
 tests.append((17, ("등록된 지역 정보가 없습니다" in none_body, none_body.count("<path")), (True, 230)))
 GAP_GOOD = "신안군은 7개 영역 가운데 5개가 부족합니다. 제때 가기 어려운 주민이 85.5%입니다."
@@ -63,9 +63,9 @@ GAP_FALLBACK = "신안군의 7개 영역 가운데 5개가 부족으로 나왔�
 SINAN = {"region": "전남광주통합특별시|신안군"}
 app.ask_gemma = lambda prompt: GAP_GOOD
 sinan_body = client.get("/region", query_string=SINAN).get_data(as_text=True)
-tests.append((18, ("전남광주통합특별시 신안군" in sinan_body, "인구 42,337명" in sinan_body, "7개 영역 중 5개 부족, 1개 경계" in sinan_body), (True, True, True)))
+tests.append((18, ("전남광주통합특별시 신안군" in sinan_body, "인구 42,337명" in sinan_body, "7개 영역 중 5개 부족</strong>" in sinan_body), (True, True, True)))
 tests.append((19, (GAP_GOOD in sinan_body, "AI 요약" in sinan_body), (True, True)))
-tests.append((20, (sinan_body.count('<div class="card"'), "의료거리 · 부족" in sinan_body, "의료자원 · 경계" in sinan_body), (7, True, True)))
+tests.append((20, (sinan_body.count('<div class="card"'), "의료거리 · 부족" in sinan_body, "의료자원 · 보통" in sinan_body), (7, True, True)))
 tests.append((21, ("주민 천 명당 의사 수 0.66명 (전국 중앙값 1.3명)" in sinan_body, "이 지역 안에는 분만 가능한 기관이 없습니다." in sinan_body, "전국 230곳과 견준 판정" in sinan_body), (True, True, True)))
 tests.append((22, ("유형: 농어촌형 (두 유형의 중간에 가까움)" in sinan_body, "알아 둘 점" in sinan_body, 'href="/library?region=' in sinan_body), (True, False, True)))
 app.ask_gemma = lambda prompt: "신안군은 7개 영역 가운데 5개가 부족합니다. 제때 가기 어려운 주민이 99%입니다."
@@ -89,11 +89,11 @@ app.ask_gemma = lambda prompt: "잘 모르겠습니다."
 tests.append((32, "기본 요약" in client.get("/region", query_string=SINAN).get_data(as_text=True), True))
 access_body = client.get("/", query_string={"domain": "access"}).get_data(as_text=True)
 tests.append((33, (access_body.count('fill="#2e7d5b"'), "의료거리 영역의 판정으로 칠했습니다" in access_body, 'value="access" selected' in access_body), (161, True, True)))
-tests.append((34, ("부족 4개 이상" in access_body, "넉넉</span>" in access_body), (False, True)))
+tests.append((34, ("부족 4개 이상" in access_body, "넉넉</span>" in access_body, "보통</span>" in access_body, "비슷</span>" in access_body, "부족 → 보통 → 넉넉 순서입니다" in access_body), (False, True, True, False, True)))
 tests.append((35, client.get("/static/style.css").status_code, 200))
 tests.append((36, ['href="/static/style.css"' in b for b in (home_body, sinan_body, lib_body, smoke_body)], [True, True, True, True]))
 tests.append((37, (sinan_body.count('class="chip"'), 'class="btn' in sinan_body, 'class="btn' in home_body), (7, True, True)))
-tests.append((38, ('class="hint"' in sinan_body, 'class="alert"' in sinan_body), (True, True)))
+tests.append((38, ('class="hint"' in sinan_body, 'class="alert"' in sinan_body, "경계" in sinan_body, "비슷</span>" in sinan_body, "기준선에 가까운 보통입니다" in sinan_body), (True, True, False, False, True)))
 
 passed = 0
 for num, actual, expected in tests:
