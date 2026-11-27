@@ -344,8 +344,9 @@ AI 요약: ...두 문장...        ← "AI 요약" 또는 "기본 요약" 표시
 | 파일 | 내용 |
 | :--- | :--- |
 | `fetch_summaries.py` | 230곳의 요약문을 gemma4 에게 미리 받아 `data/gap_summaries.csv` 에 쓴다 |
-| `build_site.py` | 화면 조각, 지도 색, 요약을 모아 `site_data.js` 를 쓴다 |
-| `site_data.js` | `const SITE = {...};` 자료 파일. `build_site.py` 가 만든다 |
+| `build_site.py` | 화면 조각을 자르고 링크를 바꾸는 작은 함수들, 요약 검사에 쓸 값 뽑기 |
+| `make_site.py` | Flask 화면을 그려 조각·지도 색·요약을 모으고 `site_data.js` 를 쓴다 |
+| `site_data.js` | `const SITE = {...};` 자료 파일. `make_site.py` 가 만든다 |
 | `index.html` | 머리띠와 화면 조각을 끼울 빈 자리 |
 | `summary.js` | 요약 받기 |
 | `view.js` | 주소 읽기, 화면 조각 끼워 넣기, 지도 색 바꾸기 |
@@ -388,7 +389,7 @@ AI 요약: ...두 문장...        ← "AI 요약" 또는 "기본 요약" 표시
 | :--- | :--- | :--- | :--- |
 | 14단계 | 규칙과 명세 정리 (`.clinerules`, 이 문서의 12절) | 없음 | 문서 커밋 |
 | 15단계 | 요약 미리 받아 두기 (`fetch_summaries.py`, `data/gap_summaries.csv`) | `python test_static.py` | 전부 통과, CSV 230줄 |
-| 16단계 | 자료 파일 만들기 (`build_site.py`, `site_data.js`) | `python test_static.py` | 전부 통과 |
+| 16단계 | 자료 파일 만들기 (`build_site.py`, `make_site.py`, `site_data.js`) | `python test_static.py` | 전부 통과 |
 | 17단계 | 화면 (`index.html`, `summary.js`, `view.js`) | 브라우저에서 Flask 화면과 견주기 | 견준 화면이 모두 같음 |
 | 18단계 | 푸시, 스마트폰 확인, 스크린샷, README·PROGRESS 정리 | 스마트폰 확인표 | 확인표 전부 통과 |
 

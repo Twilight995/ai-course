@@ -6,6 +6,8 @@ import tempfile
 import csv
 import build_site
 import fetch_summaries
+import json
+import make_site
 
 tests = []
 rows = logic.load_gap()
@@ -60,6 +62,24 @@ tests.append((13, (info["allowed"], info["banned"], info["count"]), (["0.10", "0
 tests.append((14, (info["saved"], info["saved_label"], info["prompt"] == logic.build_gap_prompt(gwanak), sorted(info.keys())), ("글", "기본 요약", True, ["allowed", "banned", "count", "prompt", "saved", "saved_label"])))
 info = build_site.summary_info(yangcheon, ("가", "나"))
 tests.append((15, (info["allowed"], len(info["banned"]), info["count"]), (["0", "7"], 7, 0)))
+app.ask_gemma = fake_error
+calls.clear()
+site = make_site.build_all(saved)
+tests.append((16, (len(site["home"]), len(site["regions"]), len(site["colors"]), len(site["summary"]), len(site["legends"]), len(calls)), (17, 230, 230, 230, 8, 0)))
+pieces = "".join(site["home"].values()) + "".join(site["regions"].values()) + site["missing"]
+tests.append((17, (pieces.count('href="/'), pieces.count("도서관 자세히"), pieces.count('<div class="panel summary" id="summary"><strong></strong><p></p></div>'), pieces.count('class="panel summary"')), (0, 0, 230, 230)))
+tests.append((18, (site["home"][""].count("<path"), site["home"]["서울특별시"].count("<path"), site["home"]["서울특별시"].startswith("<h1>서울특별시</h1>"), 'href="#region=' in site["home"][""]), (230, 25, True, True)))
+tests.append((19, site["colors"]["서울특별시|관악구"], {"": "#c0392b", "access": "#2e7d5b", "medical": "#c0392b", "elder": "#c0392b", "infant": "#2e7d5b", "child": "#7a828c", "disabled": "#c0392b", "library": "#c0392b"}))
+tests.append((20, (site["legends"]["access"]["note"], len(site["legends"][""]["legend"]), len(site["legends"]["access"]["legend"])), ("의료거리 영역의 판정으로 칠했습니다. 구역을 누르면 그 지역으로 갑니다.", 3, 4)))
+tests.append((21, ("등록된 지역 정보가 없습니다" in site["missing"], 'href="#"' in site["missing"], site["regions"]["전남광주통합특별시|신안군"].count('class="chip"'), "7개 영역 중 5개 부족, 1개 경계" in site["regions"]["전남광주통합특별시|신안군"]), (True, True, 7, True)))
+tests.append((22, (site["summary"]["전남광주통합특별시|신안군"]["saved"], site["summary"]["전남광주통합특별시|신안군"]["saved_label"]), saved["전남광주통합특별시|신안군"]))
+tests.append((23, make_site.build_all({})["summary"]["전남광주통합특별시|신안군"]["saved"], FALLBACK))
+out = os.path.join(tempfile.gettempdir(), "site_data_test.js")
+make_site.main(out)
+with open(out, encoding="utf-8") as f:
+    written = f.read()
+os.remove(out)
+tests.append((24, (written.startswith("const SITE = {"), written.endswith("};"), sorted(json.loads(written[13:-1]).keys())), (True, True, ["colors", "home", "legends", "missing", "regions", "summary"])))
 
 passed = 0
 for num, actual, expected in tests:
