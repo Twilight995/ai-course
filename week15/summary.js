@@ -35,7 +35,7 @@ async function loadSummary(key) {
   const info = SITE.summary[key];
   let label = info.saved_label;
   let text = info.saved;
-  showSummary("AI 요약", "AI 요약을 받는 중입니다");
+  showSummary("요약", "AI 요약을 받는 중입니다");
   try {
     const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(), 6000));
     const answer = await Promise.race([ask(info.prompt), timeoutPromise]);

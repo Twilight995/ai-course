@@ -35,7 +35,7 @@ function render() {
   const view = document.getElementById("view");
   window.scrollTo(0, 0);
   if (state.region !== "") {
-    if (state.region in SITE.regions) {
+    if (Object.prototype.hasOwnProperty.call(SITE.regions, state.region)) {
       view.innerHTML = SITE.regions[state.region];
       loadSummary(state.region);
     } else {
@@ -43,8 +43,8 @@ function render() {
     }
     return;
   }
-  const known = state.sido in SITE.home;
-  const domain = state.domain in SITE.legends ? state.domain : "";
+  const known = Object.prototype.hasOwnProperty.call(SITE.home, state.sido);
+  const domain = Object.prototype.hasOwnProperty.call(SITE.legends, state.domain) ? state.domain : "";
   view.innerHTML = SITE.home[known ? state.sido : ""];
   if (!known) {
     view.querySelector(".filters + p").textContent = "등록된 지역 정보가 없습니다";
